@@ -12,12 +12,29 @@ MAIN PROC
      
      MOV AH,1
      INT 21H
-     MOV B,AL   ;this one will keep the user input value in B
+     MOV B,AL   ;this one will keep the user input value in B    
+     
+     
+     MOV AH,2
+     MOV DL,10  ;newline 
+     INT 21H    
+     MOV DL,13
+     INT 21H
+     
+     
      
      MOV AH,2
      MOV DL,A
      ADD DL,48
      INT 21H
+     
+     
+     MOV AH,2
+     MOV DL,10  ;newline
+     INT 21H    
+     MOV DL,13
+     INT 21H
+     
      
      MOV AH,2
      MOV DL,B
