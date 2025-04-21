@@ -1,32 +1,33 @@
 .MODEL SMALL
 .STACK 100H
 .DATA
+   A DB "NON-NEGATIVE$"  
+   B DB 10,13,"NEGATIVE $"
+    
+   
 .CODE
+
 MAIN PROC
     
-    MOV AH,1
-    INT 21H
-    MOV BL,AL
+    MOV AX,@DATA
+    MOV DS,AX  
     
-    MOV AH,1
-    INT 21H
-    MOV BH,AL
+    MOV BX,-10 
     
-    CMP BL,BH
-    
+    CMP BX,0
     JGE L1
     JMP L2
     
     L1:
-    MOV AH,2
-    MOV DL,BL
+    MOV AH,9
+    LEA DX,A
     INT 21H
     JMP EXIT:
     
     L2:
-    MOV AH,2
-    MOV DL,BH
-    INT 21H
+    MOV AH,9
+    LEA DX,b
+    INT 21h
     JMP EXIT:
     
     
