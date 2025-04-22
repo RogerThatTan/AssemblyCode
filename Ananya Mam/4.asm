@@ -1,85 +1,70 @@
 .MODEL SMALL
-
 .STACK 100H
- 
 .DATA
-
-    posMsg  DB 13, 10, 'Number is Positive$'
-
-    negMsg  DB 13, 10, 'Number is Negative$'
-
-    zeroMsg DB 13, 10, 'Number is Zero$'
- 
-.CODE
-
+    
+    MSG1 DB "ENTER A NUMBER: $"
+    MSG2 DB 10,13,"POSITIVE$"
+    MSG3 DB 10,13,"NEGATIVE$"
+    MSG4 DB 10,13,"ZERO$"
+    
+.CODE 
 MAIN PROC
-
-    MOV AX, @DATA
-
-    MOV DS, AX
- 
-   
-
-    MOV AH, 01H
-
+    
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    
+    MOV AH,9
+    LEA DX,MSG1
     INT 21H
-
-    MOV BL, AL         
- 
-    CMP BL, '-'       
-
-    JNE NOT_NEGATIVE
- 
- 
-
-    MOV AH, 01H
-
+    
+    MOV AH,1
     INT 21H
-
-    CMP AL, '0'
-
-    JE PRINT_ZERO
-
-    JMP PRINT_NEGATIVE
- 
-NOT_NEGATIVE:
-
-    CMP BL, '0'
-
-    JE PRINT_ZERO
-
-    JMP PRINT_POSITIVE
- 
-PRINT_POSITIVE:
-
-    LEA DX, posMsg
-
-    JMP PRINT
- 
-PRINT_NEGATIVE:
-
-    LEA DX, negMsg
-
-    JMP PRINT
- 
-PRINT_ZERO:
-
-    LEA DX, zeroMsg
- 
-PRINT:
-
-    MOV AH, 09H
-
+    CMP AL, "-"
+    JE  READ_NEGATIVE
+    
+    SUB AL,30H
+    MOV BL,AL
+    JMP CHECK_NUMBER
+    
+READ_NEGATIVE:
+    
+    MOV AH,1
     INT 21H
- 
+    SUB AL,30H
+    NEG AL
+    MOV BL,AL
+    
+CHECK_NUMBER:
+    
+    CMP BL,0
+    JE IS_ZERO
+    JL IS_NEGATIVE
 
-
-    MOV AH, 4CH
-
+IS_POSITIVE:
+    MOV AH,9
+    LEA DX,MSG2
     INT 21H
+    JMP EXIT: 
+    
+IS_NEGATIVE:
 
+    MOV AH,9
+    LEA DX,MSG3
+    INT 21H
+    JMP EXIT:
+
+IS_ZERO:
+
+    MOV AH,9
+    LEA DX,MSG4
+    INT 21H
+    JMP EXIT:  
+    
+EXIT:  
+    
+    MOV AH,4CH
+    INT 21H
 MAIN ENDP
- 
-END MAIN
-
+END MAIN 
  

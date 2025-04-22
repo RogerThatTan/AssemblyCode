@@ -1,43 +1,42 @@
 .MODEL SMALL
 .STACK 100H
- 
 .DATA
-    MSG1 DB 'Enter a character: $'
-    NEWLINE DB 13, 10, '$'
- 
+    MSG1 DB "ENTER A CHARACTER: $"
 .CODE
 MAIN PROC
-    MOV AX, @DATA
-    MOV DS, AX
- 
-   
+    MOV AX,@DATA
+    MOV DS,AX
+    
     MOV AH,9
-    LEA DX, MSG1
-    INT 21h
- 
-
+    LEA DX,MSG1
+    INT 21H
+    
+    
     MOV AH,1
-    INT 21h
-    MOV BL, AL   
- 
- 
-    MOV AH,9
-    LEA DX, NEWLINE
-    INT 21h
- 
-    MOV CX, 50
- 
-PRINT_LOOP:
-    MOV AH, 2
-    MOV DL, BL
-    INT 21h
- 
-    DEC CX           
-    JNZ PRINT_LOOP  
- 
- 
-    MOV AH, 4Ch
-    INT 21h
-MAIN ENDP
- 
+    INT 21H
+    MOV BL,AL
+    
+    MOV AH,2
+    MOV DL,10
+    INT 21H
+    MOV DL,13
+    INT 21H
+    
+    MOV CX,50
+    
+    LOOPMAMA:
+    
+    MOV AH,2
+    MOV DL,BL
+    INT 21H
+    
+    DEC CX
+    JNZ LOOPMAMA
+    
+    
+    EXIT:
+    MOV AH,4CH
+    INT 21H
+    
+    MAIN ENDP
 END MAIN
