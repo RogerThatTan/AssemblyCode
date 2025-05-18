@@ -1,0 +1,74 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "ENTER A HEXADECIMAL NUMBER (1 BYTE): $"
+    MSG2 DB 10,13,"RESULT AFTER SETTING LOWER 4 BITS TO 0: $"
+    HEX_VALUE DB ?
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    MOV AH, 9
+    LEA DX, MSG1
+    INT 21H
+
+    MOV AH, 1
+    INT 21H
+    SUB AL, '0'
+    CMP AL, 9
+    JBE IS_DIGIT
+    SUB AL, 7
+
+IS_DIGIT:
+    MOV BL, AL
+
+    MOV AH, 1
+    INT 21H
+    SUB AL, '0'
+    CMP AL, 9
+    JBE IS_DIGIT2
+    SUB AL, 7
+
+IS_DIGIT2:
+    MOV BH, AL
+
+    SHL BH, 4
+    OR BL, BH
+
+    MOV HEX_VALUE, BL
+
+    AND BL, 0F0H
+
+    MOV AH, 9
+    LEA DX, MSG2
+    INT 21H
+
+    MOV AL, BL
+    SHR AL, 4
+    ADD AL, '0'
+    CMP AL, '9'
+    JBE DISPLAY_DIGIT
+    ADD AL, 7
+
+DISPLAY_DIGIT:
+    MOV DL, AL
+    MOV AH, 2
+    INT 21H
+
+    MOV AL, BL
+    AND AL, 0FH
+    ADD AL, '0'
+    CMP AL, '9'
+    JBE DISPLAY_DIGIT2
+    ADD AL, 7
+
+DISPLAY_DIGIT2:
+    MOV DL, AL
+    MOV AH, 2
+    INT 21H
+
+    MOV AH, 4CH
+    INT 21H
+MAIN ENDP
+END MAIN

@@ -1,0 +1,281 @@
+;PROGRAM 1 
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+   MSG1 DB "ENTER CHAR: $"
+   MSG2 DB 10,13,"CONVERTED CHAR: $"   
+   NUM DB ?
+   
+.CODE
+MAIN PROC
+    
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    MOV AH,9
+    LEA DX,MSG1
+    INT 21H
+    
+    MOV AH,1
+    INT 21H
+    MOV NUM,AL 
+    
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+    
+     
+    CMP NUM,'A'
+    JL NOT_LETTER
+    CMP NUM,'Z'
+    JLE CONVERT_1
+    
+   
+    CMP NUM,'a'
+    JL NOT_LETTER
+    CMP NUM,'z'
+    JG NOT_LETTER
+  
+    MOV BL, NUM
+    SUB BL, 20H
+    JMP CONVERT_2
+    
+CONVERT_1:
+   
+    MOV BL, NUM
+    OR BL, 20H
+    JMP CONVERT_2
+    
+CONVERT_2:
+
+    MOV AH,2
+    MOV DL, BL
+    INT 21H
+    JMP EXIT    
+    
+NOT_LETTER:
+  
+    MOV AH,2
+    MOV DL, NUM
+    INT 21H
+    
+EXIT:
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN 
+
+
+;PROGRAM-2
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+
+   MSG2 DB 10,13,"IS A NUMBER $"
+   MSG3 DB 10,13,"IS NOT A NUMBER$"   
+   MSG4 DB 10,13,"NUMBER IS EVEN$"   
+   MSG5 DB 10,13,"NUMBER IS ODD$"   
+   NUM DB ?
+   
+.CODE
+MAIN PROC 
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    
+    MOV AH,1
+    INT 21H
+    MOV NUM,AL
+    
+    CMP NUM,'0'
+    JL NOT_NUMBER
+    CMP NUM,'9'
+    JG NOT_NUMBER
+    
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+    
+    SUB NUM,'0'
+    
+    TEST NUM,1
+    JZ EVEN
+    MOV AH,9
+    LEA DX,MSG5
+    INT 21H
+    JMP EXIT
+    
+    EVEN:
+    MOV AH,9
+    LEA DX,MSG4
+    INT 21H
+    JMP EXIT
+    
+    NOT_NUMBER:
+    MOV AH,9
+    LEA DX,MSG3
+    INT 21H 
+
+    
+EXIT:
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN 
+
+
+
+
+;PROGRAM-3
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "ENTER A HEXADECIMAL NUMBER (1 BYTE): $"
+    MSG2 DB 10,13,"RESULT AFTER SETTING LOWER 4 BITS TO 0: $"
+    HEX_VALUE DB ?
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    MOV AH, 9
+    LEA DX, MSG1
+    INT 21H
+
+    MOV AH, 1
+    INT 21H
+    SUB AL, '0'
+    CMP AL, 9
+    JBE IS_DIGIT
+    SUB AL, 7
+
+IS_DIGIT:
+    MOV BL, AL
+
+    MOV AH, 1
+    INT 21H
+    SUB AL, '0'
+    CMP AL, 9
+    JBE IS_DIGIT2
+    SUB AL, 7
+
+IS_DIGIT2:
+    MOV BH, AL
+
+    SHL BH, 4
+    OR BL, BH
+
+    MOV HEX_VALUE, BL
+
+    AND BL, 0F0H
+
+    MOV AH, 9
+    LEA DX, MSG2
+    INT 21H
+
+    MOV AL, BL
+    SHR AL, 4
+    ADD AL, '0'
+    CMP AL, '9'
+    JBE DISPLAY_DIGIT
+    ADD AL, 7
+
+DISPLAY_DIGIT:
+    MOV DL, AL
+    MOV AH, 2
+    INT 21H
+
+    MOV AL, BL
+    AND AL, 0FH
+    ADD AL, '0'
+    CMP AL, '9'
+    JBE DISPLAY_DIGIT2
+    ADD AL, 7
+
+DISPLAY_DIGIT2:
+    MOV DL, AL
+    MOV AH, 2
+    INT 21H
+
+    MOV AH, 4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;PROGRAM 4
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "ENTER FIRST CHAR: $"
+    MSG2 DB 10,13,"ENTER SECOND CHAR: $"
+    SUCCESS DB 10,13,"EQUAL$"
+    WARNING DB 10,13,"NOT EQUAL$"
+    NUM1 DB ?
+    NUM2 DB ?
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+
+    MOV AH, 9
+    LEA DX, MSG1
+    INT 21H
+    MOV AH, 1
+    INT 21H
+    MOV NUM1, AL
+
+    MOV AH, 9
+    LEA DX, MSG2
+    INT 21H
+    MOV AH, 1
+    INT 21H
+    MOV NUM2, AL
+
+
+    MOV AL, NUM1
+    XOR AL, NUM2
+    JZ EQUAL
+
+
+    MOV AH, 9
+    LEA DX, WARNING
+    INT 21H
+    JMP EXIT
+
+EQUAL:
+
+    MOV AH, 9
+    LEA DX, SUCCESS
+    INT 21H
+
+EXIT:
+    MOV AH, 4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+
