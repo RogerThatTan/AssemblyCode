@@ -1,0 +1,51 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "ENTER FIRST CHAR: $"
+    MSG2 DB 10,13,"ENTER SECOND CHAR: $"
+    SUCCESS DB 10,13,"EQUAL$"
+    WARNING DB 10,13,"NOT EQUAL$"
+    NUM1 DB ?
+    NUM2 DB ?
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+
+    MOV AH, 9
+    LEA DX, MSG1
+    INT 21H
+    MOV AH, 1
+    INT 21H
+    MOV NUM1, AL
+
+    MOV AH, 9
+    LEA DX, MSG2
+    INT 21H
+    MOV AH, 1
+    INT 21H
+    MOV NUM2, AL
+
+
+    MOV AL, NUM1
+    XOR AL, NUM2
+    JZ EQUAL
+
+
+    MOV AH, 9
+    LEA DX, WARNING
+    INT 21H
+    JMP EXIT
+
+EQUAL:
+
+    MOV AH, 9
+    LEA DX, SUCCESS
+    INT 21H
+
+EXIT:
+    MOV AH, 4CH
+    INT 21H
+MAIN ENDP
+END MAIN
