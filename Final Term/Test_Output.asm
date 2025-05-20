@@ -1,0 +1,62 @@
+.MODEL SMALL 
+.STACK 100H
+.DATA
+     MSG1 DB "OUTPUT:",10,13,"$"
+     NEWLINE DB 10,13,"$"
+     NUM DB 2
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    MOV AH,9
+    LEA DX,MSG1
+    INT 21H
+    MOV CX,5
+    
+PRINT_LOOP:
+    
+    MOV AL,NUM
+    SHL AL,1
+    CMP AL,10
+    JE PRINT_DD1
+    CMP AL,12
+    JE PRINT_DD2
+ADD AL,'0'
+    MOV DL,AL
+    MOV AH,2
+    INT 21H
+    JMP SKIP_PRINT
+    
+PRINT_DD1: 
+
+    MOV DL,'1'
+    MOV AH,2
+    INT 21H
+    MOV DL,'0'
+    MOV AH,2
+    INT 21H
+    JMP SKIP_PRINT
+
+PRINT_DD2: 
+    
+    MOV DL,'1'
+    MOV AH,2
+    INT 21H
+    MOV DL,'2'
+    MOV AH,2
+    INT 21H
+
+SKIP_PRINT:
+    
+    MOV AH,9
+    LEA DX,NEWLINE
+    INT 21H
+    ADD NUM,1
+    LOOP PRINT_LOOP
+    
+    MOV AH,4CH
+    INT 21H
+    MAIN ENDP
+END MAIN
+    
