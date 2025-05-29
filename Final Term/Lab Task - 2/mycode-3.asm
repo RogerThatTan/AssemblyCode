@@ -25,7 +25,6 @@ DIGIT1:
     
     MOV AH,1
     INT 21H
-    MOV CH,AL
     SUB AL,'0'
     CMP AL,9  
     JBE DIGIT2
