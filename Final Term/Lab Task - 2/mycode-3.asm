@@ -15,7 +15,6 @@ MAIN PROC
     
     MOV AH,1
     INT 21H
-    MOV CL,AL
     SUB AL, '0'
     CMP AL,9
     JBE DIGIT1
@@ -26,14 +25,12 @@ DIGIT1:
     
     MOV AH,1
     INT 21H
-    MOV CH,AL
     SUB AL,'0'
     CMP AL,9  
     JBE DIGIT2
     SUB AL,7
 DIGIT2:
     OR BH,AL
-    MOV HEX_VALUE,BH
     AND BH, 0F0H
     MOV AH,9
     LEA DX,MSG2
