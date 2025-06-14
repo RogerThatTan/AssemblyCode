@@ -1,0 +1,106 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "INPUT VALID HEX:$"
+    MSG2 DB 10,13,"OUTPUT IN BINARY:$"
+    MSG3 DB 10,13,"NOT A VALID HEX INPUT$"
+    EVEN_MSG DB 10,13,"THE NUMBER IS EVEN$"
+    ODD_MSG  DB 10,13,"THE NUMBER IS ODD$"
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+
+    MOV AH,9
+    LEA DX,MSG1
+    INT 21H
+
+    MOV BX,0
+    MOV CX,4
+
+INPUT_LOOP:
+
+    MOV AH,1
+    INT 21H
+    CMP AL,13
+    JE  OUTPUT
+
+    CMP AL,'0'
+    JB INVALID
+    CMP AL,'9'
+    JBE DIGIT
+    CMP AL,'A'
+    JB INVALID
+    CMP AL,'F'
+    JBE UPPER_LETTER
+    CMP AL,'a'
+    JB INVALID
+    CMP AL,'f'
+    JBE LOWER_LETTER
+    JMP INVALID
+
+    DIGIT:
+    SUB AL,30H
+    JMP SHIFT
+
+    UPPER_LETTER:
+    SUB AL,37H
+    JMP SHIFT
+
+    LOWER_LETTER:
+    SUB AL,57H
+
+    SHIFT:
+    SHL BX,4
+    OR BL,AL
+    LOOP INPUT_LOOP
+
+    OUTPUT:
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+
+    MOV AX, BX 
+    MOV CX,16
+
+    OUTPUT_BIN:
+    SHL BX,1
+    JNC ZERO
+    MOV DL,49
+    MOV AH,2
+    INT 21H
+    JMP OUTPUT_2
+
+    ZERO:
+    MOV DL,48
+    MOV AH,2
+    INT 21H
+
+    OUTPUT_2:
+    LOOP OUTPUT_BIN
+   
+
+    TEST AL, 1
+    JZ EVEN_NUM
+    MOV AH, 9
+    LEA DX, ODD_MSG
+    INT 21H
+    JMP EXIT
+
+    EVEN_NUM:
+    MOV AH, 9
+    LEA DX, EVEN_MSG
+    INT 21H
+    JMP EXIT
+
+    INVALID:
+    MOV AH,9
+    LEA DX,MSG3
+    INT 21H
+
+
+    EXIT:
+    MOV AH,4CH
+    INT 21H
+    MAIN ENDP
+END MAIN
