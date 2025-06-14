@@ -1,45 +1,57 @@
 .MODEL SMALL
 .STACK 100H
 .DATA
-    MSG1 DB "INPUT:$"
-    MSG2 DB 10,13,"OUTPUT:$"
+    MSG1 DB "INPUT: $"
+    MSG2 DB 10,13,"OUTPUT: $"
 .CODE
 MAIN PROC
-    MOV AX,DATA
+    
+    
+    MOV AX,@DATA
     MOV DS,AX
     
     MOV AH,9
     LEA DX,MSG1
     INT 21H
     
+    MOV BX,0
     MOV CX,8
-    MOV BL,0
-INPUT_LOOP:
+    
+    INPUT:
     MOV AH,1
     INT 21H
-    SUB AL,'0'
+    CMP AL,13
+    JE OUTPUT
+    
+    AND AL,0FH
     SHL BL,1
-    OR  BL,AL
-    LOOP INPUT_LOOP
+    OR BL,AL
+    LOOP INPUT
     
+    OUTPUT:
     OR BL,04H
-    
     MOV AH,9
     LEA DX,MSG2
     INT 21H
     
     MOV CX,8
-OUTPUT_LOOP:
+    
+    OUTPUT_DIG:
     SHL BL,1
-    JC  ONE
-    MOV DL,'0'
-    JMP DISPLAY
-ONE:
-    MOV DL,'1'
-DISPLAY:
+    JNC ZERO
+    MOV DL,49
     MOV AH,2
     INT 21H
-    LOOP OUTPUT_LOOP
+    JMP OUTPUT_2
+    
+    ZERO:
+    MOV DL,48
+    MOV AH,2
+    INT 21H
+    
+    OUTPUT_2:
+    LOOP OUTPUT_DIG
+
     
     EXIT:
     MOV AH,4CH
