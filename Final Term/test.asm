@@ -1,0 +1,64 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "INPUT:$"
+    MSG2 DB 10,13,"OUTPUT:$"
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+
+    MOV AH,9
+    LEA DX,MSG1
+    INT 21H
+
+    MOV BX,0
+    MOV CX,4
+
+    INPUT:
+    MOV AH,1
+    INT 21H
+    CMP AL,13
+    JE OUTPUT 
+    CMP AL,41H
+    JGE LETTER
+    AND AL,0FH
+    JMP SHIFT
+
+    LETTER:
+    SUB AL,37H
+    
+    SHIFT:
+    SHL BX,4
+    OR BL,AL
+    LOOP INPUT
+
+    OUTPUT:
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+
+    MOV CX,4
+
+    FOR2:
+    MOV AH,2 
+    MOV DL,BH
+    SHR DL,4
+    ROL BX,4
+    CMP DL,10
+    JGE LETTER_OUT
+    ADD DL,30H 
+    INT 21H
+    JMP EXIT
+
+    LETTER_OUT:
+    ADD DL,37H 
+    INT 21H
+
+    EXIT:
+    LOOP FOR2
+    MOV AH,4CH
+    INT 21H
+    MAIN ENDP
+
+END MAIN 
