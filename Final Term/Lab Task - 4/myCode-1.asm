@@ -5,47 +5,56 @@
     MSG2 DB 10,13,"OUTPUT: $"
 .CODE
 MAIN PROC
-    MOV AX, @DATA
-    MOV DS, AX
-
-    MOV AH, 9
-    LEA DX, MSG1
+    
+    
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    MOV AH,9
+    LEA DX,MSG1
     INT 21H
-
-
-    MOV CX, 8
-    MOV BL, 0           
-
-INPUT_LOOP:
-    MOV AH, 1           
+    
+    MOV BX,0
+    MOV CX,8
+    
+    INPUT:
+    MOV AH,1
     INT 21H
-    SUB AL, '0'         
-    SHL BL, 1           
-    OR BL, AL           
-    LOOP INPUT_LOOP
-
-    AND BL, 7FH   
+    CMP AL,13
+    JE OUTPUT
+    
+    AND AL,0FH
+    SHL BL,1
+    OR BL,AL
+    LOOP INPUT
+    
+    OUTPUT:
+    AND BL,7FH
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+    
+    MOV CX,8
+    
+    OUTPUT_DIG:
+    SHL BL,1
+    JNC ZERO
+    MOV DL,49
+    MOV AH,2
+    INT 21H
+    JMP OUTPUT_2
+    
+    ZERO:
+    MOV DL,48
+    MOV AH,2
+    INT 21H
+    
+    OUTPUT_2:
+    LOOP OUTPUT_DIG
 
     
-    MOV AH, 9
-    LEA DX, MSG2
-    INT 21H
-
-    MOV CX, 8
-OUTPUT_LOOP:
-    SHL BL, 1           
-    JC PRINT_ONE      
-    MOV DL, '0'         
-    JMP DISPLAY
-PRINT_ONE:
-    MOV DL, '1'         
-DISPLAY:
-    MOV AH, 2
-    INT 21H
-    LOOP OUTPUT_LOOP
-
     EXIT:
-    MOV AH, 4CH
+    MOV AH,4CH
     INT 21H
-MAIN ENDP
+    MAIN ENDP
 END MAIN
