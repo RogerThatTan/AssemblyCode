@@ -6,27 +6,25 @@
     num DB 1
 .CODE
 MAIN PROC
-    MOV AX, @DATA   
+    MOV AX, @DATA
     MOV DS, AX
-    
-print_loop:               
     MOV AH, 9
     LEA DX, msg1
     INT 21H
     MOV CX, 5
-
+print_loop:
     MOV AL, num
     SHL AL, 1
     CMP AL, 10
     JE Print_DD1
     CMP AL, 12
-    JE Print_DD2 
+    JE Print_DD2
     
     ADD AL, '0'
     MOV DL, AL
     MOV AH, 2
     INT 21H
-    JMP skip_print 
+    JMP skip_print
     
 Print_DD1:
     MOV DL, '1'
