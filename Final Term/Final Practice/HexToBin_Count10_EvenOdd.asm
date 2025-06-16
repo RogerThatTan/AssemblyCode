@@ -1,0 +1,150 @@
+;INPUT 2 HEX VALUE AND CONVERT IT TO BINARY AND THEN COUNT THE NUMBER OF 1'S AND 0'S AND THEN CHECK IF THE
+;COUNT OF ONE IS EVEN THEN PRINT EVEN OTHERWISE PRINT ODD
+;THIS CODE IS VALID FOR ONLY 8BIT BINARY NOT FOR 16BIT.
+
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "INPUT VALID HEX:$"
+    MSG2 DB 10,13,"OUTPUT IN BINARY:$"
+    MSG3 DB 10,13,"NOT A VALID HEX INPUT$" 
+    MSG4 DB 10,13,"EVEN$"
+    MSG5 DB 10,13,"ODD$"
+    MSG6 DB 10,13,"COUNT OF 1's: $"
+    MSG7 DB 10,13,"COUNT OF 0's:$"
+    ONE_COUNT  DB 0
+    ZERO_COUNT DB 0
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    MOV AH,9
+    LEA DX,MSG1
+    INT 21H
+    
+    MOV BX,0
+    MOV CX,2
+    MOV ONE_COUNT,0
+    MOV ZERO_COUNT,0
+    
+INPUT_LOOP:
+    
+    MOV AH,1
+    INT 21H
+    
+    CMP AL,13
+    JE OUTPUT
+    
+    CMP AL,'0'
+    JB INVALID
+    CMP AL,'9'
+    JBE DIGIT
+    
+    CMP AL,'A'
+    JB INVALID
+    CMP AL,'F'
+    JBE UPPER_LETTER
+    
+    CMP AL,'a'
+    JB INVALID
+    CMP AL,'f'
+    JBE LOWER_LETTER
+    
+    JMP INVALID
+
+DIGIT: 
+
+    SUB AL,30H
+    JMP SHIFT
+
+UPPER_LETTER:
+    
+    SUB AL,37H
+    JMP SHIFT
+    
+LOWER_LETTER:
+    
+    SUB AL,57H
+    
+SHIFT:
+    
+    SHL BX,4
+    OR BL,AL
+    LOOP INPUT_LOOP
+
+OUTPUT:
+    
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+    
+    MOV CX,8
+
+OUTPUT_BIN:
+    
+    SHL BL,1
+    JNC ZERO
+    
+    INC ONE_COUNT
+    MOV DL,49
+    MOV AH,2
+    INT 21H
+    JMP OUTPUT_2
+
+ZERO:
+    INC ZERO_COUNT
+    MOV DL,48
+    MOV AH,2
+    INT 21H 
+OUTPUT_2:
+    LOOP OUTPUT_BIN
+    
+    MOV AH,9
+    LEA DX,MSG6
+    INT 21H
+      
+    MOV AH,2  
+    MOV DL,ONE_COUNT
+    ADD DL,30H
+    INT 21H   
+    
+    
+    
+    MOV AH,9
+    LEA DX,MSG7
+    INT 21H
+      
+    MOV AH,2  
+    MOV DL,ZERO_COUNT
+    ADD DL,30H
+    INT 21H   
+    
+    TEST ONE_COUNT,1
+    JZ EVEN_NUM
+    
+    MOV AH,9
+    LEA DX,MSG5
+    INT 21H
+    JMP EXIT
+
+EVEN_NUM:
+    
+    MOV AH,9
+    LEA DX,MSG4
+    INT 21H
+    JMP EXIT  
+
+INVALID:
+    MOV AH,9
+    LEA DX,MSG3        
+    INT 21H
+
+EXIT:
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+       
+    
