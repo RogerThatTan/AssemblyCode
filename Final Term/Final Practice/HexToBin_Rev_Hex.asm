@@ -1,0 +1,164 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB "INPUT VALID HEX: $"
+    MSG2 DB 10,13,"CONVERTED TO BINARY: $"
+    MSG3 DB 10,13,"REVERSED BINARY: $"
+    MSG4 DB 10,13,"NEW HEX VALUE AFTER REVERSE: $"
+    INVALID_MSG DB 10,13,"INVALID HEX INPUT$"
+    ORIGINAL DB ?
+    REVERSED_NUM DB ?
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+
+    MOV AH,9
+    LEA DX,MSG1 
+    INT 21H
+
+    MOV CX,2
+    MOV BX,0
+
+    INPUT_LOOP:
+    MOV AH,1
+    INT 21H
+
+    CMP AL,13
+    JE OUTPUT
+
+    CMP AL,'0'
+    JB INVALID
+    CMP AL,'9'
+    JBE DIGIT
+    CMP AL,'A'
+    JB INVALID
+    CMP AL,'F'
+    JBE UPPER_LETTER
+    CMP AL,'a'
+    JB INVALID
+    CMP AL,'f'
+    JBE LOWER_LETTER
+    JMP INVALID
+
+    DIGIT:
+    SUB AL,30H
+    JMP SHIFT
+
+    UPPER_LETTER:
+    SUB AL,37H
+    JMP SHIFT
+
+    LOWER_LETTER:
+    SUB AL,57H
+
+    SHIFT:
+    SHL BX,4
+    OR BL,AL 
+    LOOP INPUT_LOOP
+
+    MOV ORIGINAL,BL
+
+    OUTPUT:
+    MOV AH,9
+    LEA DX,MSG2
+    INT 21H
+
+    MOV CX,8
+
+    OUTPUT_BIN:
+    SHL BL,1
+    JNC ZERO
+    MOV DL,49
+    MOV AH,2
+    INT 21H
+    JMP OUTPUT_2
+
+    ZERO:
+    MOV AH,2
+    MOV DL,48
+    INT 21H
+
+    OUTPUT_2:
+    LOOP OUTPUT_BIN
+
+    REVERSE_MODE:
+    MOV CX,8
+    MOV BH,0
+    MOV BL,ORIGINAL
+
+    REVERSE_LOOP:
+    SHR BL,1
+    RCL BH,1
+    LOOP REVERSE_LOOP
+
+    MOV REVERSED_NUM,BH
+    
+    MOV AH,9
+    LEA DX,MSG3
+    INT 21H
+
+    MOV CX,8
+    MOV BL,REVERSED_NUM
+
+    OUTPUT_BIN_REV:
+    SHL BL,1
+    JNC ZERO_REV
+    MOV DL,49
+    MOV AH,2
+    INT 21H
+    JMP OUTPUT_2_REV
+
+    ZERO_REV:
+    MOV AH,2
+    MOV DL,48
+    INT 21H
+
+    OUTPUT_2_REV:
+    LOOP OUTPUT_BIN_REV
+
+    MOV AH,9
+    LEA DX,MSG4
+    INT 21H
+    
+    MOV BL,REVERSED_NUM
+    MOV DL,BL
+    SHR DL,4
+    CMP DL,9
+    JLE DIG_H
+    ADD DL,37H
+    JMP PRINT_H
+    
+    DIG_H:
+    ADD DL,30H
+    
+    PRINT_H:
+    MOV AH,2
+    INT 21H
+    
+    MOV DL,BL
+    AND DL,0FH
+    CMP DL,9
+    JLE DIG_L
+    ADD DL,37H
+    JMP PRINT_L
+    
+    DIG_L:
+    ADD DL,30H
+    
+    PRINT_L:
+    MOV AH,2
+    INT 21H
+    JMP EXIT
+
+
+    INVALID:
+    MOV AH,9
+    LEA DX,INVALID_MSG
+    INT 21H
+
+    EXIT:
+    MOV AH,4CH
+    INT 21H
+    MAIN ENDP 
+    END MAIN 
